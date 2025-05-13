@@ -6,7 +6,6 @@ class Edge {
     int source;
     int destination;
     int capacity;
-    Edge* next;
 
 public:
     Edge(int src, int dest, int cap) {
@@ -15,12 +14,17 @@ public:
         capacity = cap;
     }
 
-    int getDestination() {
-        return destination;
+    Edge(const Edge &edge) {
+        source = edge.source;
+        destination = edge.destination;
+        capacity = edge.capacity;
     }
-    int getCapacity() {
-        return capacity;
-    }
+
+    int getDestination() {return destination;}
+    int getCapacity() {return capacity;}
+    int getSource() {return source;}
+    void setCapacity(int cap) {capacity = cap;}
+
 };
 
 class Graph {
@@ -31,9 +35,10 @@ class Graph {
     int* edgeCounter;
     int startingNode;
     int endingNode;
+    bool directed;
 
 public:
-    Graph(int numberEdges, int numberNodes, int sNode, int eNode) {
+    Graph(int numberEdges, int numberNodes, int sNode, int eNode, bool directedI) {
         edges = numberEdges;
         nodes = numberNodes;
         startingNode = sNode;
@@ -47,13 +52,14 @@ public:
             adjList[i] = new Edge*[nodes];
         }
         edgeCounter = new int[nodes]{0};
+        directed = directedI;
     }
 
     void addEdge(int source, int destination, int capacity) {
         //Adding edge to matrix
         adjMatrix[source][destination] = capacity;
 
-        // //Adding edge to list
+        //Adding edge to list
         adjList[source][edgeCounter[source]] = new Edge{source, destination, capacity};
         edgeCounter[source]++;
     }
@@ -121,8 +127,22 @@ public:
         endingNode = value;
     }
 
-    int getStartingNode() {return startingNode;}
+    int getStartingNode() const {return startingNode;}
     int getEndingNode() {return endingNode;}
+    int** getAdjMatrix() {return adjMatrix;}
+    Edge*** getAdjList() {return adjList;}
+    int getNodes() {return nodes;}
+    int* getEdgeCounterList(){return edgeCounter;}
+    int getEdgeCounter() {
+        int returnValue = 0;
+        for (int i = 0; i < nodes; i++) {
+            returnValue += edgeCounter[i];
+        }
+        if (!directed) {
+            return returnValue/2;
+        }
+        return returnValue;
+    }
 
     ~Graph() {
         for (int i = 0; i < nodes; ++i) {

@@ -4,7 +4,11 @@ project(AIZO_Projekt_2)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(AIZO_Projekt_2 main.cpp
-        Algorythms.h
         GUI.h
         Utilities.h
-        Graphs.h)
+        Graphs.h
+        Algorythms/ShortestPathAlgorithms.h
+        Algorythms/MST.h
+        DataStructures/MinHeap.h
+        DataStructures/SortedEdgeList.h
+)

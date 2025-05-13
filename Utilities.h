@@ -11,20 +11,24 @@
 
 
 class Utilities {
-    static void createNonDirectedGraph(Graph* &graph, int nodes, int pDensity, bool** &isInSpanningTree, bool** &edgesList, int minCap, int maxCap) {
+    static void createNonDirectedGraph(Graph* &graph, int nodes, int pDensity, bool** &isInSpanningTree, bool** &edgesList) {
         //Number of edges based on number of nodes and density percentage
         int maxEdges = (nodes*(nodes-1))/2;
         int edges = (int)(pDensity * maxEdges / 100.0);
         int edgeCounter = 0;
+        int minCap = -10, maxCap = 10;
         std::random_device rd;
         std::mt19937 gen(rd());
 
         //Allocating memory
-        graph = new Graph(edges, nodes, 0, 0);
+        graph = new Graph(edges, nodes, 0, 0, false);
 
         //Creating spanning tree
         for (int i = 0; i < nodes - 1; i++) {
             int cap = std::uniform_int_distribution<>(minCap, maxCap)(gen);
+            while (cap == 0) {
+                cap = std::uniform_int_distribution<>(minCap, maxCap)(gen);
+            }
             graph->addEdge(i, i + 1, cap);
             graph->addEdge(i + 1, i, cap);
             edgesList[i][i+1] = true;
@@ -39,6 +43,9 @@ class Utilities {
             int randomNode = std::uniform_int_distribution<>(0, nodes - 1)(gen);
             int randomNextNode = std::uniform_int_distribution<>(0, nodes - 1)(gen);
             int cap = std::uniform_int_distribution<>(minCap, maxCap)(gen);
+            while (cap == 0) {
+                cap = std::uniform_int_distribution<>(minCap, maxCap)(gen);
+            }
             //Check for loops and exisitng edges
             if (randomNode == randomNextNode || edgesList[randomNode][randomNextNode]|| edgesList[randomNextNode][randomNode]) continue;
 
@@ -51,18 +58,22 @@ class Utilities {
         }
     }
 
-    static void createDirectedGraph(Graph* &graph, int nodes, int pDensity, bool** &isInSpanningTree, bool** &edgesList, int minCap, int maxCap) {
+    static void createDirectedGraph(Graph* &graph, int nodes, int pDensity, bool** &isInSpanningTree, bool** &edgesList) {
         int maxEdges = nodes*(nodes-1);
         int edges = (int)round(maxEdges * pDensity / 100.0);
         int edgeCounter = 0;
+        int minCap = -10, maxCap = 10;
         std::random_device rd;
         std::mt19937 gen(rd());
 
         //Allocating memory
-        graph = new Graph(edges, nodes, 0, 0);
+        graph = new Graph(edges, nodes, 0, 0, true);
 
         for (int i = 0; i < nodes - 1; i++) {
             int cap = std::uniform_int_distribution<>(minCap, maxCap)(gen);
+            while (cap == 0) {
+                cap = std::uniform_int_distribution<>(minCap, maxCap)(gen);
+            }
             graph->addEdge(i, i + 1, cap);
             edgesList[i][i+1] = true;
             isInSpanningTree[i][i+1] = true;
@@ -74,6 +85,9 @@ class Utilities {
             int randomNode = std::uniform_int_distribution<>(0, nodes - 1)(gen);
             int randomNextNode = std::uniform_int_distribution<>(0, nodes - 1)(gen);
             int cap = std::uniform_int_distribution<>(minCap, maxCap)(gen);
+            while (cap == 0) {
+                cap = std::uniform_int_distribution<>(minCap, maxCap)(gen);
+            }
             //Check for loops and exisitng edges
             if (randomNode == randomNextNode || edgesList[randomNode][randomNextNode]) continue;
 
@@ -85,17 +99,20 @@ class Utilities {
     }
 
 public:
-    static Graph* createGraph(int** data) {
+    static Graph* createGraphFromFile(int** data) {
         int edges = data[0][0], nodes = data[0][1], startingNode = data[0][2], endingNode = data[0][3];
-        auto graphTest = new Graph(edges, nodes, startingNode, endingNode);
+        Graph* graphTest = nullptr;
         //If the file structure is mst create non directed graph
         if (startingNode == -1 && endingNode == -1) {
+            graphTest = new Graph(edges, nodes, startingNode, endingNode, false);
+
             for (int i = 1; i <= edges; ++i) {
                 graphTest->addEdge(data[i][0], data[i][1], data[i][2]);
                 graphTest->addEdge(data[i][1], data[i][0], data[i][2]);
             }
         //Create directed graph
         } else {
+            graphTest = new Graph(edges, nodes, startingNode, endingNode, true);
             for (int i = 1; i <= edges; ++i) {
                 graphTest->addEdge(data[i][0], data[i][1], data[i][2]);
             }
@@ -131,6 +148,7 @@ public:
             list[0][i] = std::stoi(tempString);
             i++;
         }
+        //Adding -1 template to check for what type of graph
         if (i == 2) {
             list[0][2] = -1;
             list[0][3] = -1;
@@ -148,7 +166,7 @@ public:
         return list;
     }
 
-    static void generateNonDirectedRandomGraph(Graph* &graph, int nodes, int pDensity, int choice) {
+    static void generateNonDirectedRandomGraph(Graph* &graph, int nodes, int pDensity) {
         bool** edgesList = new bool*[nodes];
         for (int i = 0; i < nodes; i++) {
             edgesList[i] = new bool[nodes]{false};
@@ -158,9 +176,6 @@ public:
             inSpanningTree[i] = new bool[nodes]{false};
         }
 
-        int maxCap, minCap;
-        if (choice == 1) {}
-
         //If density is 99% remove 1% from full graph
         if (pDensity == 99) {
             pDensity = 100;
@@ -168,7 +183,7 @@ public:
             std::mt19937 gen(rd());
 
             //Creating full graph
-            createNonDirectedGraph(graph, nodes, pDensity, inSpanningTree, edgesList, minCap, maxCap);
+            createNonDirectedGraph(graph, nodes, pDensity, inSpanningTree, edgesList);
             int maxEdges = (nodes * (nodes - 1)) / 2;
             //Calculating edges to remove
             int edgesToRemove = (int)(maxEdges / 100.0);
@@ -187,7 +202,7 @@ public:
                 j++;
             }
         } else {
-            createNonDirectedGraph(graph, nodes, pDensity, inSpanningTree, edgesList, minCap, maxCap);
+            createNonDirectedGraph(graph, nodes, pDensity, inSpanningTree, edgesList);
         }
         //Deallocating memory
         for (int i = 0; i < nodes; i++) {
@@ -200,7 +215,7 @@ public:
         delete[] inSpanningTree;
     }
 
-    static void generateDirectedRandomGraph(Graph* &graph, int nodes, int pDensity, int choice) {
+    static void generateDirectedRandomGraph(Graph* &graph, int nodes, int pDensity) {
         bool** edgesList = new bool*[nodes];
         for (int i = 0; i < nodes; i++) {
             edgesList[i] = new bool[nodes]{false};
@@ -210,9 +225,6 @@ public:
             inSpanningTree[i] = new bool[nodes]{false};
         }
 
-        int maxCap, minCap;
-        if (choice == 1) {}
-
         //If density is 99% remove 1% from full graph
         if (pDensity == 99) {
             pDensity = 100;
@@ -220,7 +232,7 @@ public:
             std::mt19937 gen(rd());
 
             //Creating full graph
-            createDirectedGraph(graph, nodes, pDensity, inSpanningTree, edgesList, minCap, maxCap);
+            createDirectedGraph(graph, nodes, pDensity, inSpanningTree, edgesList);
             int maxEdges = (nodes * (nodes - 1)) / 2;
             //Calculating edges to remove
             int edgesToRemove = (int)(maxEdges / 100.0);
@@ -237,7 +249,7 @@ public:
                 j++;
             }
         } else {
-            createDirectedGraph(graph, nodes, pDensity, inSpanningTree, edgesList, minCap, maxCap);
+            createDirectedGraph(graph, nodes, pDensity, inSpanningTree, edgesList);
         }
         //Deallocating memory
         for (int i = 0; i < nodes; i++) {
