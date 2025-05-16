@@ -11,4 +11,6 @@ add_executable(AIZO_Projekt_2 main.cpp
         Algorythms/MST.h
         DataStructures/MinHeap.h
         DataStructures/SortedEdgeList.h
+        DataStructures/DisjointSet.h
+        Algorythms/MaxFlowAlgorithm.h
 )

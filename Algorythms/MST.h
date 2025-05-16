@@ -4,6 +4,7 @@
 #include "../Graphs.h"
 #include "../DataStructures/MinHeap.h"
 #include "../DataStructures/SortedEdgeList.h"
+#include "../DataStructures/DisjointSet.h"
 
 #define INF INT_MAX
 
@@ -130,13 +131,65 @@ public:
             }
         }
 
+        //Creating disjoint set with max of n nodes
+        DisjointSet dsSet(n);
+
+        //Iterating through all edges in the sorted edges
         for (int i = 0; i < graph->getEdgeCounter(); i++) {
             Edge* smallestEdge = sortedEdgeList.getSmallestElement();
             int u = smallestEdge->getSource();
             int v = smallestEdge->getDestination();
             int weight = smallestEdge->getCapacity();
 
+            //Checking if they are in the same set if not unionising
+            if (dsSet.find(u) != dsSet.find(v)) {
+                sum += weight;
+                mstSetResult[setCounter++] = new Edge(u, v, weight);
+                dsSet.unionBySize(u, v);
+            }
 
+            delete smallestEdge;
+        }
+
+        delete[] visited;
+        delete[] mstSet;
+    }
+
+    static void kruskalAlgorithmList(Graph* graph, auto &timeMatrix, auto &timeList, int &sum, auto &mstSetResult) {
+        int n = graph->getNodes();
+        auto mstSet = new Edge*[n - 1];
+        auto visited = new bool[n];
+        SortedEdgeList<Edge> sortedEdgeList(graph->getEdgeCounter());
+        sum = 0;
+        int setCounter = 0;
+        std::fill_n(visited, graph->getNodes(), false);
+
+        //Adding all edges into the list and sorting them at the same time
+        for (int i = 0; i < n; i++) {
+            for (int j = i; j < graph->getEdgeCounterList()[i]; j++) {
+                int weight = graph->getAdjList()[i][j]->getCapacity();
+                if (weight > 0) {
+                    sortedEdgeList.addEdge(Edge(i, j, weight));
+                }
+            }
+        }
+
+        //Creating disjoint set with max of n nodes
+        DisjointSet dsSet(n);
+
+        //Iterating through all edges in the sorted edges
+        for (int i = 0; i < graph->getEdgeCounter(); i++) {
+            Edge* smallestEdge = sortedEdgeList.getSmallestElement();
+            int u = smallestEdge->getSource();
+            int v = smallestEdge->getDestination();
+            int weight = smallestEdge->getCapacity();
+
+            //Checking if they are in the same set if not unionising
+            if (dsSet.find(u) != dsSet.find(v)) {
+                sum += weight;
+                mstSetResult[setCounter++] = new Edge(u, v, weight);
+                dsSet.unionBySize(u, v);
+            }
 
             delete smallestEdge;
         }

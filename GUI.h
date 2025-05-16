@@ -51,12 +51,6 @@ public:
             system("cls");
             int choice = 0;
             cout << "1.Wczytaj z pliku\n2.Wygeneruj losowy graf\n3.Wyswietl listowo i macierzowo\n4.Algorytm Djikstry\n5.Bellman-Ford\n6.Wyswietl wyniki\n7.Wyjdz\nWybierz opcje: ";
-            // if (choice1 == 2) {
-            //     cout << "1.Wczytaj z pliku\n2.Wygeneruj losowy graf\n3.Wyswietl listowo i macierzowo\n4.Algorytm Prima\n5.Algorytm Kruskala\n6.Wyswietl wyniki\n7.Wyjdz\nWybierz opcje: ";
-            // }
-            // if (choice1 == 3) {
-            //     cout << "1.Wczytaj z pliku\n2.Wygeneruj losowy graf\n3.Wyswietl listowo\n4.Wyswietl macierzowo\n5.Algorytm Forda-Flukersona\n6.Wyswietl wyniki\n7.Wyjdz\nWybierz opcje: ";
-            // }
             cin >> input;
 
             try {
@@ -236,13 +230,13 @@ public:
 
                 MSTAlgorithms::primAlgorithm(graph, timeMatrix, timeList, sum, mstSet);
                 MSTAlgorithms::printResult(graph, sum, mstSet);
-                for (int i = 0; i < graph->getNodes(); i++) {
-                    if (mstSet[i] != nullptr) {
-                        delete mstSet[i];
-                    }
-                }
-                MSTAlgorithms::primAlgorithmList(graph, timeList, sum, mstSet);
-                MSTAlgorithms::printResult(graph, sum, mstSet);
+                // for (int i = 0; i < graph->getNodes(); i++) {
+                //     if (mstSet[i] != nullptr) {
+                //         delete mstSet[i];
+                //     }
+                // }
+                // MSTAlgorithms::primAlgorithmList(graph, timeList, sum, mstSet);
+                // MSTAlgorithms::printResult(graph, sum, mstSet);
             }
             if (choice == 5) {
                 if (directed) {
@@ -262,7 +256,14 @@ public:
                 }
 
                 MSTAlgorithms::kruskalAlgorithm(graph, timeMatrix, timeList, sum, mstSet);
-                system("pause");
+                MSTAlgorithms::printResult(graph, sum, mstSet);
+                // for (int i = 0; i < graph->getNodes(); i++) {
+                //     if (mstSet[i] != nullptr) {
+                //         delete mstSet[i];
+                //     }
+                // }
+                // MSTAlgorithms::kruskalAlgorithmList(graph, timeList, sum, mstSet);
+                // MSTAlgorithms::printResult(graph, sum, mstSet);
             }
             if (choice == 6) {
                 if (graph != nullptr && mstSet != nullptr) {
@@ -271,6 +272,86 @@ public:
             }
             if (choice == 7) {
                 delete[] mstSet;
+                break;
+            }
+        }
+    }
+
+    static void algorythmMenuBellmanFort(Graph* &graph, auto &timeMatrix, auto &timeList) {
+        int* distance = nullptr;
+        int* previous = nullptr;
+        bool directed;
+        string input;
+        while (true) {
+            system("cls");
+            int choice = 0;
+            cout << "1.Wczytaj z pliku\n2.Wygeneruj losowy graf\n3.Wyswietl listowo\n4.Wyswietl macierzowo\n5.Bellman-Ford\n6.Wyswietl wyniki\n7.Wyjdz\nWybierz opcje: ";
+            cin >> input;
+
+            try {
+                choice = stoi(input);
+                if (choice > 7 || choice <= 0) throw invalid_argument("Wybierz mozliwa liczbe");
+            } catch (invalid_argument& e) {
+                cout << e.what() << endl;
+                system("pause");
+                continue;
+            }
+
+            if (choice == 1) {
+                readFromFileGUI(graph);
+                system("pause");
+            }
+            if (choice == 2) {
+                generateRandomGraphMenu(graph, directed);
+                graph->printMatrix();
+                graph->printList();
+                system("pause");
+            }
+            if (choice == 3) {
+                if (graph != nullptr) {
+                    graph->printList();
+                } else {
+                    cout << "Please generate graph first!";
+                    system("pause");
+                    continue;
+                }
+                system("pause");
+            }
+            if (choice == 4) {
+                if (graph != nullptr) {
+                    graph->printMatrix();
+                } else {
+                    cout << "Please generate graph first!";
+                    system("pause");
+                    continue;
+                }
+                system("pause");
+            }
+            if (choice == 5) {
+                if (graph == nullptr) {
+                    cout << "Stworz lub wczytaj graf\n";
+                    system("pause");
+                    continue;
+                }
+                if (!directed) {
+                    cout << "Graf musi być skierowany\n";
+                    system("pause");
+                    continue;
+                }
+                if (distance != nullptr && distance != nullptr) {
+                    delete[] distance;
+                    delete[] previous;
+                }
+
+
+                system("pause");
+            }
+            if (choice == 6) {
+
+            }
+            if (choice == 7) {
+                delete[] distance;
+                delete[] previous;
                 break;
             }
         }

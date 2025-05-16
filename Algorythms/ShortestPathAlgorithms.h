@@ -57,12 +57,23 @@ public:
         auto end = std::chrono::high_resolution_clock::now();
         timeMatrix = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
-        //Resetting the values
-        for (int i = 0; i < nodes; i++) {previous[i] = -1;}
-        for (int i = 0; i < nodes; i++) {visited[i] = false;}
-        for (int i = 0; i < nodes; i++) {distance[i] = INT_MAX;}
+        printResultDistance(graph, nodes, distance);
+        printResultPath(graph, nodes, distance, previous);
+
+        delete[] visited;
+    }
+
+    static void djikstraAlgorithmList(Graph* graph, auto &timeMatrix, auto &timeList, int* &distance, int* &previous) {
+        int nodes = graph->getNodes();
+        bool* visited = new bool[nodes]{false};
+        distance = new int[graph->getNodes()];
+        previous = new int[graph->getNodes()];
+
+        std::fill_n(distance, graph->getNodes(), INF);
+        std::fill_n(previous, graph->getNodes(), -1);
         distance[graph->getStartingNode()] = 0;
-        start = std::chrono::high_resolution_clock::now();
+
+        auto start = std::chrono::high_resolution_clock::now();
         //Same algorythm just changing the type of representation
         for (int i = 0; i < nodes; i++) {
             int nodeIndex = -1;
@@ -87,10 +98,8 @@ public:
                 }
             }
         }
-        end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::high_resolution_clock::now();
         timeList = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-        printResultDistance(graph, nodes, distance);
-        printResultPath(graph, nodes, distance, previous);
 
         delete[] visited;
     }
@@ -121,12 +130,19 @@ public:
         auto end = std::chrono::high_resolution_clock::now();
         timeMatrix = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
+        printResultDistance(graph, graph->getNodes(), distance);
+        printResultPath(graph, graph->getNodes(), distance, previous);
+    }
+
+    static void For_BellmanAlgorithmList(Graph* graph, auto &timeMatrix, auto &timeList, int* &distance, int* &previous) {
+        distance = new int[graph->getNodes()];
+        previous = new int[graph->getNodes()];
         //Setting up the table
         std::fill_n(distance, graph->getNodes(), INF);
         std::fill_n(previous, graph->getNodes(), -1);
         distance[graph->getStartingNode()] = 0;
 
-        start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::high_resolution_clock::now();
         //Iterating Vertex - 1 times to avoid negative loops
         for (int i = 0; i < graph->getNodes() - 1; i++) {
             for (int u = 0; u < graph->getNodes(); u++) {
@@ -142,11 +158,8 @@ public:
                 }
             }
         }
-        end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::high_resolution_clock::now();
         timeList = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-
-        printResultDistance(graph, graph->getNodes(), distance);
-        printResultPath(graph, graph->getNodes(), distance, previous);
     }
 
     static void changeNegativeToPositive(Graph* graph) {
