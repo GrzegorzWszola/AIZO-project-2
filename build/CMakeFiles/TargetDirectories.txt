@@ -1,0 +1,3 @@
+/home/grzegorz/Desktop/AIZO-project-2/build/CMakeFiles/AIZO_Projekt_2.dir
+/home/grzegorz/Desktop/AIZO-project-2/build/CMakeFiles/edit_cache.dir
+/home/grzegorz/Desktop/AIZO-project-2/build/CMakeFiles/rebuild_cache.dir

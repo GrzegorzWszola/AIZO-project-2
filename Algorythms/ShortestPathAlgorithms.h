@@ -1,9 +1,10 @@
 #ifndef SHORTESTPATHALGORYTHMS_H
 #define SHORTESTPATHALGORYTHMS_H
 #include <iostream>
+#include <limits.h> 
 
 #include "../Graphs.h"
-#define INF INT_MAX
+#define INF INT_MAX/2
 
 class ShortestPathAlgorithms {
     static void printPath(int node, int* &previous) {
@@ -18,13 +19,14 @@ class ShortestPathAlgorithms {
 public:
     static void djikstraAlgorithm(Graph* graph, auto &timeMatrix, auto &timeList, int* &distance, int* &previous) {
         int nodes = graph->getNodes();
-        bool* visited = new bool[nodes]{false};
+        bool* visited = new bool[nodes];
         distance = new int[graph->getNodes()];
         previous = new int[graph->getNodes()];
         auto start = std::chrono::high_resolution_clock::now();
 
         std::fill_n(distance, graph->getNodes(), INF);
         std::fill_n(previous, graph->getNodes(), -1);
+        std::fill_n(visited, graph->getNodes(), false);
         distance[graph->getStartingNode()] = 0;
 
         for (int i = 0; i < nodes; i++) {
@@ -48,7 +50,7 @@ public:
                 int weight = graph->getAdjMatrix()[nodeIndex][v];
 
                 //Adding weight to the neighbours and updating previous list
-                if (weight > 0 && !visited[v] && distance[nodeIndex] != INT_MAX && distance[nodeIndex] + weight < distance[v]) {
+                if (weight != 0 && !visited[v] && distance[nodeIndex] != INT_MAX && distance[nodeIndex] + weight < distance[v]) {
                     distance[v] = distance[nodeIndex] + weight;
                     previous[v] = nodeIndex;
                 }
@@ -57,20 +59,18 @@ public:
         auto end = std::chrono::high_resolution_clock::now();
         timeMatrix = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
-        printResultDistance(graph, nodes, distance);
-        printResultPath(graph, nodes, distance, previous);
-
         delete[] visited;
     }
 
     static void djikstraAlgorithmList(Graph* graph, auto &timeMatrix, auto &timeList, int* &distance, int* &previous) {
         int nodes = graph->getNodes();
-        bool* visited = new bool[nodes]{false};
+        bool* visited = new bool[nodes];
         distance = new int[graph->getNodes()];
         previous = new int[graph->getNodes()];
 
         std::fill_n(distance, graph->getNodes(), INF);
         std::fill_n(previous, graph->getNodes(), -1);
+        std::fill_n(visited, graph->getNodes(), false);
         distance[graph->getStartingNode()] = 0;
 
         auto start = std::chrono::high_resolution_clock::now();
@@ -92,7 +92,7 @@ public:
                 int neighbor = graph->getAdjList()[nodeIndex][v]->getDestination();
                 int weight = graph->getAdjList()[nodeIndex][v]->getCapacity();
 
-                if (weight > 0 && !visited[neighbor] && distance[nodeIndex] != INT_MAX && distance[nodeIndex] + weight < distance[neighbor]) {
+                if (weight != 0 && !visited[neighbor] && distance[nodeIndex] != INT_MAX && distance[nodeIndex] + weight < distance[neighbor]) {
                     distance[neighbor] = distance[nodeIndex] + weight;
                     previous[neighbor] = nodeIndex;
                 }
@@ -111,7 +111,7 @@ public:
         std::fill_n(distance, graph->getNodes(), INF);
         std::fill_n(previous, graph->getNodes(), -1);
         distance[graph->getStartingNode()] = 0;
-
+    
         auto start = std::chrono::high_resolution_clock::now();
         //Iterating Vertex - 1 times to avoid negative loops
         for (int i = 0; i < graph->getNodes() - 1; i++) {
@@ -120,20 +120,32 @@ public:
                     //Getting the weight of the edge to add
                     int weight = graph->getAdjMatrix()[u][v];
                     //Checking if the edge exists, if the path to the node is known and if the path is shorter
-                    if (distance[u] != INF && weight != 0 && distance[v] > distance[u] + weight) {
-                        distance[v] = distance[u] + weight;
-                        previous[v] = u;
+                    if (weight != INF && distance[u] != INF) {
+                        int newDist = distance[u] + weight;
+                        if (distance[v] > newDist) {
+                            distance[v] = newDist;
+                            previous[v] = u;
+                        }
                     }
                 }
             }
         }
+    
+        //Checking for negative weight cycles after all iterations
+        for (int u = 0; u < graph->getNodes(); u++) {
+            for (int v = 0; v < graph->getNodes(); v++) {
+                int weight = graph->getAdjMatrix()[u][v];
+                if (weight != INF && distance[u] != INF && distance[v] > distance[u] + weight) {
+                    std::cerr << "Graf posiada cykl negatywny" << std::endl;
+                    return;  // Early exit on negative cycle detection
+                }
+            }
+        }
+    
         auto end = std::chrono::high_resolution_clock::now();
         timeMatrix = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-
-        printResultDistance(graph, graph->getNodes(), distance);
-        printResultPath(graph, graph->getNodes(), distance, previous);
     }
-
+    
     static void For_BellmanAlgorithmList(Graph* graph, auto &timeMatrix, auto &timeList, int* &distance, int* &previous) {
         distance = new int[graph->getNodes()];
         previous = new int[graph->getNodes()];
@@ -186,7 +198,7 @@ public:
         std::cout << "Odleglosc od: " << graph->getStartingNode() << ", do kolejnych sasiadow: " << std::endl;
         for (int i = 0; i < nodes; i++) {
             std::cout << i << ": ";
-            if (distance[i] == INT_MAX)
+            if (distance[i] == INF)
                 std::cout << "unreachable\n";
             else
                 std::cout << distance[i] << "\n";
@@ -197,7 +209,7 @@ public:
         std::cout << "Sciezka od: " << graph->getStartingNode() << ", do kolejnych wierzcholkow" << std::endl;
         for (int i = 0; i < nodes; i++) {
             std::cout << i << ": ";
-            if (distance[i] == INT_MAX) {
+            if (distance[i] == INF) {
                 std::cout << "unreachable\n";
             } else {
                 printPath(i, previous);

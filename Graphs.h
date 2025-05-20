@@ -143,6 +143,8 @@ public:
         }
         return returnValue;
     }
+    bool getDirected(){return directed;}
+    void setDirected(bool direct){directed = direct;}
 
     ~Graph() {
         for (int i = 0; i < nodes; ++i) {

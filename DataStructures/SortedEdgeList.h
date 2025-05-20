@@ -75,6 +75,13 @@ public:
             std::cout << "Src: " << edgeList[i]->getSource() << " Dest: " << edgeList[i]->getDestination() << " Weight: " << edgeList[i]->getCapacity() << std::endl;
         }
     }
+
+    bool isEmpty() {
+        if (size != 0) {
+            return false;
+        }
+        return true;
+    }
 };
 
 #endif //SORTEDEDGELIST_H
