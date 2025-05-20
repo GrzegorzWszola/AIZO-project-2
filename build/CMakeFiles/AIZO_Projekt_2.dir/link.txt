@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/AIZO_Projekt_2.dir/main.cpp.o -o AIZO_Projekt_2 
