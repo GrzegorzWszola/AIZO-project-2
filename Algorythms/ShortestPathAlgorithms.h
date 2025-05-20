@@ -4,7 +4,7 @@
 #include <limits.h> 
 
 #include "../Graphs.h"
-#define INF INT_MAX/2
+#define INF INT_MAX
 
 class ShortestPathAlgorithms {
     static void printPath(int node, int* &previous) {
@@ -104,7 +104,7 @@ public:
         delete[] visited;
     }
 
-    static void Ford_BellmanAlgorithm(Graph* graph, auto &timeMatrix, auto &timeList, int* &distance, int* &previous) {
+    static void Ford_BellmanAlgorithm(Graph* graph, auto &timeMatrix, auto &timeList, int* &distance, int* &previous, bool &negativeCycle) {
         distance = new int[graph->getNodes()];
         previous = new int[graph->getNodes()];
         //Setting up the table
@@ -120,7 +120,7 @@ public:
                     //Getting the weight of the edge to add
                     int weight = graph->getAdjMatrix()[u][v];
                     //Checking if the edge exists, if the path to the node is known and if the path is shorter
-                    if (weight != INF && distance[u] != INF) {
+                    if (weight != 0 && distance[u] != INF) {
                         int newDist = distance[u] + weight;
                         if (distance[v] > newDist) {
                             distance[v] = newDist;
@@ -135,9 +135,10 @@ public:
         for (int u = 0; u < graph->getNodes(); u++) {
             for (int v = 0; v < graph->getNodes(); v++) {
                 int weight = graph->getAdjMatrix()[u][v];
-                if (weight != INF && distance[u] != INF && distance[v] > distance[u] + weight) {
+                if (weight != 0 && distance[u] != INF && distance[v] > distance[u] + weight) {
+                    negativeCycle = true;
                     std::cerr << "Graf posiada cykl negatywny" << std::endl;
-                    return;  // Early exit on negative cycle detection
+                    return;
                 }
             }
         }
@@ -146,7 +147,7 @@ public:
         timeMatrix = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
     }
     
-    static void For_BellmanAlgorithmList(Graph* graph, auto &timeMatrix, auto &timeList, int* &distance, int* &previous) {
+    static void Ford_BellmanAlgorithmList(Graph* graph, auto &timeMatrix, auto &timeList, int* &distance, int* &previous, bool &negativeCycle) {
         distance = new int[graph->getNodes()];
         previous = new int[graph->getNodes()];
         //Setting up the table
@@ -170,6 +171,20 @@ public:
                 }
             }
         }
+
+        //Checking for negative weight cycles after all iterations
+        for (int u = 0; u < graph->getNodes(); u++) {
+            for (int j = 0; j < graph->getEdgeCounterList()[u]; j++) {
+                int v = graph->getAdjList()[u][j]->getDestination();
+                int weight = graph->getAdjList()[u][j]->getCapacity();
+                if (distance[u] != INF && distance[v] > distance[u] + weight) {
+                    negativeCycle = true;
+                    std::cerr << "Graf posiada cykl negatywny" << std::endl;
+                    return;
+                }
+            }
+        }
+
         auto end = std::chrono::high_resolution_clock::now();
         timeList = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
     }

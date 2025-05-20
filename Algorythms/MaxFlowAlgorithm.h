@@ -10,7 +10,7 @@ class MaxFlowAlgorithm {
         auto visited = new int[n];
         std::fill_n(visited, n, 0);
 
-        if ()
+
     }
 
 public:

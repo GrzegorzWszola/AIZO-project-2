@@ -128,8 +128,16 @@ public:
                 delete[] distance;
                 delete[] previous;
                 distance = previous = nullptr;
-
                 ShortestPathAlgorithms::djikstraAlgorithm(graph, timeMatrix, timeList, distance, previous);
+                cout<<"\nWyniki macierzowe:\n";
+                ShortestPathAlgorithms::printResultDistance(graph, graph->getNodes(), distance);
+                ShortestPathAlgorithms::printResultPath(graph, graph->getNodes(), distance, previous);
+
+                delete[] distance;
+                delete[] previous;
+                distance = previous = nullptr;
+                ShortestPathAlgorithms::djikstraAlgorithmList(graph, timeMatrix, timeList, distance, previous);
+                cout<<"\nWyniki listowe:\n";
                 ShortestPathAlgorithms::printResultDistance(graph, graph->getNodes(), distance);
                 ShortestPathAlgorithms::printResultPath(graph, graph->getNodes(), distance, previous);
                 pause();
@@ -155,13 +163,26 @@ public:
                     }
                 }
 
+                bool negativeCycle = false;
                 delete[] distance;
                 delete[] previous;
                 distance = previous = nullptr;
+                ShortestPathAlgorithms::Ford_BellmanAlgorithm(graph, timeMatrix, timeList, distance, previous, negativeCycle);
+                if (!negativeCycle) {
+                    cout<<"\nWyniki macierzowe:\n";
+                    ShortestPathAlgorithms::printResultDistance(graph, graph->getNodes(), distance);
+                    ShortestPathAlgorithms::printResultPath(graph, graph->getNodes(), distance, previous);
+                }
 
-                ShortestPathAlgorithms::Ford_BellmanAlgorithm(graph, timeMatrix, timeList, distance, previous);
-                ShortestPathAlgorithms::printResultDistance(graph, graph->getNodes(), distance);
-                ShortestPathAlgorithms::printResultPath(graph, graph->getNodes(), distance, previous);
+                delete[] distance;
+                delete[] previous;
+                distance = previous = nullptr;
+                ShortestPathAlgorithms::Ford_BellmanAlgorithmList(graph, timeMatrix, timeList, distance, previous, negativeCycle);
+                if (!negativeCycle) {
+                    cout<<"\nWyniki listowe:\n";
+                    ShortestPathAlgorithms::printResultDistance(graph, graph->getNodes(), distance);
+                    ShortestPathAlgorithms::printResultPath(graph, graph->getNodes(), distance, previous);
+                }
                 pause();
             }
 
@@ -244,13 +265,20 @@ public:
                     continue;
                 }
 
-                for (int i = 0; i < graph->getNodes(); ++i) {
+                for (int i = 0; i < graph->getNodes() - 1; i++) {
                     delete mstSet[i];
                     mstSet[i] = nullptr;
                 }
+                MSTAlgorithms::primAlgorithm(graph, timeMatrix, timeList, sum, mstSet);
+                cout << "\nWyniki macierzowo:\n";
+                MSTAlgorithms::printResult(graph, sum, mstSet);
 
-                // MSTAlgorithms::primAlgorithm(graph, timeMatrix, timeList, sum, mstSet);
+                for (int i = 0; i < graph->getNodes() - 1; i++) {
+                    delete mstSet[i];
+                    mstSet[i] = nullptr;
+                }
                 MSTAlgorithms::primAlgorithmList(graph, timeList, sum, mstSet);
+                cout << "\nWyniki listowo:\n";
                 MSTAlgorithms::printResult(graph, sum, mstSet);
                 pause();
             }
@@ -267,13 +295,20 @@ public:
                     continue;
                 }
 
-                for (int i = 0; i < graph->getNodes(); ++i) {
+                for (int i = 0; i < graph->getNodes() - 1; ++i) {
                     delete mstSet[i];
                     mstSet[i] = nullptr;
                 }
+                MSTAlgorithms::kruskalAlgorithm(graph, timeMatrix, timeList, sum, mstSet);
+                cout << "\nWyniki macierzowo:\n";
+                MSTAlgorithms::printResult(graph, sum, mstSet);
 
-                // MSTAlgorithms::kruskalAlgorithm(graph, timeMatrix, timeList, sum, mstSet);
+                for (int i = 0; i < graph->getNodes() - 1; ++i) {
+                    delete mstSet[i];
+                    mstSet[i] = nullptr;
+                }
                 MSTAlgorithms::kruskalAlgorithmList(graph, timeMatrix, timeList, sum, mstSet);
+                cout << "\nWyniki listowo:\n";
                 MSTAlgorithms::printResult(graph, sum, mstSet);
                 pause();
             }
