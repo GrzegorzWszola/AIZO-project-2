@@ -137,7 +137,6 @@ public:
                 int weight = graph->getAdjMatrix()[u][v];
                 if (weight != 0 && distance[u] != INF && distance[v] > distance[u] + weight) {
                     negativeCycle = true;
-                    std::cerr << "Graf posiada cykl negatywny" << std::endl;
                     return;
                 }
             }
@@ -179,7 +178,6 @@ public:
                 int weight = graph->getAdjList()[u][j]->getCapacity();
                 if (distance[u] != INF && distance[v] > distance[u] + weight) {
                     negativeCycle = true;
-                    std::cerr << "Graf posiada cykl negatywny" << std::endl;
                     return;
                 }
             }

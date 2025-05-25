@@ -3,7 +3,6 @@
 
 #include "../Graphs.h"
 #include "../DataStructures/MinHeap.h"
-#include "../DataStructures/SortedEdgeList.h"
 #include "../DataStructures/DisjointSet.h"
 
 #define INF INT_MAX
@@ -124,7 +123,7 @@ public:
         int n = graph->getNodes();
         auto mstSet = new Edge*[n - 1];
         auto visited = new bool[n];
-        SortedEdgeList<Edge> sortedEdgeList(graph->getEdgeCounter());
+        MinHeap<Edge> edgeHeap(graph->getEdgeCounter());
         sum = 0;
         int setCounter = 0;
         std::fill_n(visited, graph->getNodes(), false);
@@ -135,7 +134,7 @@ public:
                 for (int j = i; j < n; j++) {
                     int weight = graph->getAdjMatrix()[i][j];
                     if (weight != 0) {
-                        sortedEdgeList.addEdge(Edge(i, j, weight));
+                        edgeHeap.insertElement(Edge(i, j, weight));
                     }
                 }
             }
@@ -144,7 +143,7 @@ public:
                 for (int j = 0; j < n; j++) {
                     int weight = graph->getAdjMatrix()[i][j];
                     if (weight != 0) {
-                        sortedEdgeList.addEdge(Edge(i, j, weight));
+                        edgeHeap.insertElement(Edge(i, j, weight));
                     }
                 }
             }
@@ -154,8 +153,8 @@ public:
         DisjointSet dsSet(n);
 
         //Iterating through all edges in the sorted edges
-        while (!sortedEdgeList.isEmpty()){
-            Edge* smallestEdge = sortedEdgeList.getSmallestElement();
+        while (!edgeHeap.empty()){
+            Edge* smallestEdge = edgeHeap.getMinElement();
             int u = smallestEdge->getSource();
             int v = smallestEdge->getDestination();
             int weight = smallestEdge->getCapacity();
@@ -178,7 +177,7 @@ public:
         int n = graph->getNodes();
         auto mstSet = new Edge*[n - 1];
         auto visited = new bool[n];
-        SortedEdgeList<Edge> sortedEdgeList(graph->getEdgeCounter());
+        MinHeap<Edge> edgeHeap(graph->getEdgeCounter());
         sum = 0;
         int setCounter = 0;
         std::fill_n(visited, graph->getNodes(), false);
@@ -191,7 +190,7 @@ public:
                 int u = graph->getAdjList()[i][j]->getSource();
                 
                 if (u < v) {
-                    sortedEdgeList.addEdge(Edge(u, v, weight));
+                    edgeHeap.insertElement(Edge(u, v, weight));
                 }
             }
         }
@@ -200,8 +199,8 @@ public:
         //Creating disjoint set with max of n nodes
         DisjointSet dsSet(n);
 
-        while (!sortedEdgeList.isEmpty()){
-            Edge* smallestEdge = sortedEdgeList.getSmallestElement();
+        while (!edgeHeap.empty()){
+            Edge* smallestEdge = edgeHeap.getMinElement();
             int u = smallestEdge->getSource();
             int v = smallestEdge->getDestination();
             int weight = smallestEdge->getCapacity();

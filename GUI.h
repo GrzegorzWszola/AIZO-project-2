@@ -41,12 +41,12 @@ public:
             string input;
             chrono::milliseconds timeMatrix, timeList;
             int choice = 0;
-            cout << "1. Najkrotsza sciezka\n2. Drzewo rozpinajace\n3. Maksymalny przeplyw\n4. Wyjdz\nWybierz problem: ";
+            cout << "1. Najkrotsza sciezka\n2. Drzewo rozpinajace\n3. Wyjdz\nWybierz problem: ";
             cin >> input;
 
             try {
                 choice = stoi(input);
-                if (choice > 4 || choice <= 0) throw invalid_argument("Wybierz mozliwa liczbe");
+                if (choice > 3 || choice <= 0) throw invalid_argument("Wybierz mozliwa liczbe");
             } catch (invalid_argument& e) {
                 cout << e.what() << endl;
                 pause();
@@ -54,10 +54,7 @@ public:
 
             if (choice == 1) algorythmMenuShortest(graph, timeMatrix, timeList);
             if (choice == 2) algorythmMenuMST(graph, timeMatrix, timeList);
-            if (choice == 3) {
-                // TODO: Maksymalny przeplyw
-            }
-            if (choice == 4) break;
+            if (choice == 3) break;
         }
     }
 
@@ -107,11 +104,21 @@ public:
                     pause();
                     continue;
                 }
-                cout << "Zmieniamy wartosci na dodatnie, poniewaz w algorytmie Djikstry nie moze byc ujemnych wartosci krawedzi\n";
-                ShortestPathAlgorithms::changeNegativeToPositive(graph);
-                graph->printMatrix();
-                graph->printList();
-
+                bool hasNegative = false;
+                for (int i = 0; i < graph->getNodes(); i++) {
+                    for (int j = 0; j < graph->getNodes(); j++) {
+                        if (graph->getAdjMatrix()[i][j] < 0) {
+                            hasNegative = true;
+                            break;
+                        }
+                    }
+                    if (hasNegative) break;
+                }
+                if (hasNegative) {
+                    cout << "W grafie sa wartosci negatywne nie mozna uzyc algorytmu Djikstry\n";
+                    pause();
+                    continue;
+                }
                 if (graph->getStartingNode() == -1) {
                     string startInput;
                     cout << "Podaj wierzcholek startowy: ";
@@ -172,7 +179,7 @@ public:
                     cout<<"\nWyniki macierzowe:\n";
                     ShortestPathAlgorithms::printResultDistance(graph, graph->getNodes(), distance);
                     ShortestPathAlgorithms::printResultPath(graph, graph->getNodes(), distance, previous);
-                }
+                } else {cout<<"Cykl negatywny";}
 
                 delete[] distance;
                 delete[] previous;
@@ -182,7 +189,7 @@ public:
                     cout<<"\nWyniki listowe:\n";
                     ShortestPathAlgorithms::printResultDistance(graph, graph->getNodes(), distance);
                     ShortestPathAlgorithms::printResultPath(graph, graph->getNodes(), distance, previous);
-                }
+                } else {cout<<"Cykl negatywny";}
                 pause();
             }
 
